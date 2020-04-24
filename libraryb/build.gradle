@@ -1,0 +1,45 @@
+apply plugin: 'com.android.library'
+android {
+    compileSdkVersion 29
+    defaultConfig {
+        minSdkVersion 22
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    sourceSets {
+        main {
+            jni.srcDirs = []
+//                jniLibs.srcDirs = ['src/main/jniLibs']//设置目标的so存放路径
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+
+        lintOptions {
+            abortOnError false
+        }
+    }
+
+    task makeJar(type: Jar){
+        //删除存在的
+        delete 'build/libs/newsdk.jar'  //删除存在的
+        archivesBaseName = 'newsdk'  //输出的jar包名称
+        from(project.zipTree('build/intermediates/packaged-classes/release/classes.jar'))
+        from(project.zipTree('build/intermediates/packaged-classes/release/libs/AMap_Search_V7.1.0_20191030.jar')) //需要打包的第三方jar包
+        destinationDir = file('build/libs')  //打成jar包后存放的文件目录
+    }
+    makeJar.dependsOn(build)
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.12'
+    implementation files('libs/AMap_Search_V7.1.0_20191030.jar')
+}
